@@ -39,7 +39,7 @@ wt <- function(coefs, mu, y, i) {
 }
 
 eta <- function(coefs, mu, y, i) {
-  return(coefs[1] + coefs[2] * log(i) + coefs[3] * log(y[i-1]) 
+  return(coefs[1] + coefs[2] * log(i) + coefs[3] * y[i-1] 
          + coefs[4] * log(y[i-1]/mu[i-1]))
 }
 
@@ -71,9 +71,11 @@ U <- function(q) {
     mu[i] <- exp(eta(q, mu, y, i))
   }
   
-  valor <- 0
-  for (i in 2:length(y)) {
-    valor = valor + ident(y[i]) * (q(5) + q(6) * eta(q, mu, y, i) 
+  valor <- - 1/(2 * s2) * (q[1] - medias[1] + q[2] - medias[2] + q[3] - medias[3]
+                           + q[4] - medias[4] + q[5] - medias[5] + q[6] - medias[6])
+  
+  for (i in 3:length(y)) {
+    valor = valor + ident(y[i]) * (q[5] + q[6] * eta(q, mu, y, i-1) 
                                    + log(wt(q, mu, y, i))) 
     + (1 - ident(y[i])) * (-exp(eta(q, mu, y, i)) + y[i] 
                            + log(exp(eta(q, mu, y, i))) - log(factorial(y[i]))
@@ -83,14 +85,83 @@ U <- function(q) {
   return(valor)
 }
 
-l11 <- function(q) {
-  valor <- 0
+l1gama <- function(q, mu, y) {
+  valor <- - (q[5] - medias[5]) / s2
+  
+  for (i in 3:length(y)) {
+    valor = valor + (1 - ident(y[i]) - wt(q, mu, y, i))
+  }
+  
+  return(valor)
+}
+
+l1lambda <- function(q, mu, y) {
+  valor <- - (q[6] - medias[6]) / s2
+  
+  for (i in 3:length(y)) {
+    valor = valor + (1 - ident(y[i])) + eta(q, mu, y, i-1) 
+    - wt(q, mu, y, i) * eta(q, mu, y, i-1)
+  }
+  
+  return(valor)
+}
+
+l2beta0 <- function(q, mu, y) {
+  valor <- - (q[1] - medias[1]) / s2
   
   for (i in 2:length(y)) {
-    valor = valor + 
+    valor = valor + ((1 - ident(y[i])) * y[i] * 1 / exp(eta(q, mu, y, i)) 
+  - exp(exp(eta(q, mu, y, i))) / (exp(exp(eta(q, mu, y, i))) - 1)) * exp(eta(q, mu, y, i))
   }
+  
+  return(valor)
+}
+
+l2beta1 <- function(q, mu, y) {
+  valor <- - (q[2] - medias[2]) / s2
+  
+  for (i in 2:length(y)) {
+    valor = valor + ((1 - ident(y[i])) * y[i] * 1 / exp(eta(q, mu, y, i)) 
+                     - exp(exp(eta(q, mu, y, i))) / (exp(exp(eta(q, mu, y, i))) - 1)) * log(i) * exp(eta(q, mu, y, i))
+  }
+  
+  return(valor)
+}
+
+l2phi1 <- function(q, mu, y) {
+  valor <- - (q[3] - medias[3]) / s2
+  
+  for (i in 2:length(y)) {
+    valor = valor + ((1 - ident(y[i])) * y[i] * 1 / exp(eta(q, mu, y, i)) 
+                     - exp(exp(eta(q, mu, y, i))) / (exp(exp(eta(q, mu, y, i))) - 1)) * y[i-1] * exp(eta(q, mu, y, i))
+  }
+  
+  return(valor)
+}
+
+l2theta1 <- function(q, mu, y) {
+  valor <- - (q[4] - medias[4]) / s2
+  
+  for (i in 2:length(y)) {
+    valor = valor + ((1 - ident(y[i])) * y[i] * 1 / exp(eta(q, mu, y, i)) 
+                     - exp(exp(eta(q, mu, y, i))) / (exp(exp(eta(q, mu, y, i))) - 1)) * log(y[i-1]/mu[i-1]) * exp(eta(q, mu, y, i))
+  }
+  
+  return(valor)
 }
 
 grad_U <- function(q) {
+  mu <- NULL
+  mu[1] <- mean(y)
   
+  for (i in 2:length(y)) {
+    mu[i] <- exp(eta(q, mu, y, i))
+  }
+  
+  return(c(l2beta0(q, mu, y), 
+         l2beta1(q, mu, y), 
+         l2phi1(q, mu, y),
+         l2theta1(q, mu, y),
+         l1gama(q, mu, y),
+         l1lambda(q, mu, y)))
 }
