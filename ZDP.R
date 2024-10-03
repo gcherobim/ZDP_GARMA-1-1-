@@ -1,5 +1,4 @@
-rm(list = ls())
-
+## Função identificadora
 ident <- function(x) {
   if (x == c) {
     return(1)
@@ -7,6 +6,8 @@ ident <- function(x) {
     return(0)
   }
 }
+
+## Poisson Deflacionada
 
 ZDP <- function(coefs, mu, y, eta, x) {
   return((1 - wt(coefs, mu, y, i)) * ident(x) 
@@ -42,8 +43,6 @@ eta <- function(coefs, mu, y, i) {
          + coefs[4] * log(y[i-1]/mu[i-1]))
 }
 
-## Poisson Deflacionada
-
 serie <- function(coefs, tam) {
   mu <- NULL
   mu[1] <- sample(0:15, 1)
@@ -62,11 +61,36 @@ serie <- function(coefs, tam) {
   return(y)
 }
 
-coefs <- c(-1.8, 0.5, -0.5, -0.3, 4, -0.3)
-tam <- 1000
-y <- serie(coefs, tam)
+## Funções do Hamiltoniano
 
-hist(y[501:1000])
-plot.ts(y[501:1000])
-table(y[501:1000])/tam
-acf(y[501:1000])
+U <- function(q) {
+  mu <- NULL
+  mu[1] <- mean(y)
+  
+  for (i in 2:length(y)) {
+    mu[i] <- exp(eta(q, mu, y, i))
+  }
+  
+  valor <- 0
+  for (i in 2:length(y)) {
+    valor = valor + ident(y[i]) * (q(5) + q(6) * eta(q, mu, y, i) 
+                                   + log(wt(q, mu, y, i))) 
+    + (1 - ident(y[i])) * (-exp(eta(q, mu, y, i)) + y[i] 
+                           + log(exp(eta(q, mu, y, i))) - log(factorial(y[i]))
+                           - log(1 - exp(-exp(eta(q, mu, y, i)))))
+  }
+  
+  return(valor)
+}
+
+l11 <- function(q) {
+  valor <- 0
+  
+  for (i in 2:length(y)) {
+    valor = valor + 
+  }
+}
+
+grad_U <- function(q) {
+  
+}
