@@ -82,7 +82,7 @@ U <- function(q) {
                            - log(1 - exp(-exp(eta(q, mu, y, i)))))
   }
   
-  return(valor)
+  return(-valor)
 }
 
 l1gama <- function(q, mu, y) {
@@ -92,7 +92,7 @@ l1gama <- function(q, mu, y) {
     valor = valor + (1 - ident(y[i]) - wt(q, mu, y, i))
   }
   
-  return(valor)
+  return(-valor)
 }
 
 l1lambda <- function(q, mu, y) {
@@ -103,7 +103,7 @@ l1lambda <- function(q, mu, y) {
     - wt(q, mu, y, i) * eta(q, mu, y, i-1)
   }
   
-  return(valor)
+  return(-valor)
 }
 
 l2beta0 <- function(q, mu, y) {
@@ -114,7 +114,7 @@ l2beta0 <- function(q, mu, y) {
   - exp(exp(eta(q, mu, y, i))) / (exp(exp(eta(q, mu, y, i))) - 1)) * exp(eta(q, mu, y, i))
   }
   
-  return(valor)
+  return(-valor)
 }
 
 l2beta1 <- function(q, mu, y) {
@@ -125,7 +125,7 @@ l2beta1 <- function(q, mu, y) {
                      - exp(exp(eta(q, mu, y, i))) / (exp(exp(eta(q, mu, y, i))) - 1)) * log(i) * exp(eta(q, mu, y, i))
   }
   
-  return(valor)
+  return(-valor)
 }
 
 l2phi1 <- function(q, mu, y) {
@@ -136,7 +136,7 @@ l2phi1 <- function(q, mu, y) {
                      - exp(exp(eta(q, mu, y, i))) / (exp(exp(eta(q, mu, y, i))) - 1)) * y[i-1] * exp(eta(q, mu, y, i))
   }
   
-  return(valor)
+  return(-valor)
 }
 
 l2theta1 <- function(q, mu, y) {
@@ -147,7 +147,7 @@ l2theta1 <- function(q, mu, y) {
                      - exp(exp(eta(q, mu, y, i))) / (exp(exp(eta(q, mu, y, i))) - 1)) * log(y[i-1]/mu[i-1]) * exp(eta(q, mu, y, i))
   }
   
-  return(valor)
+  return(-valor)
 }
 
 grad_U <- function(q) {
