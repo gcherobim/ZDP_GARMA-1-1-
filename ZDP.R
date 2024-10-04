@@ -71,14 +71,16 @@ U <- function(q) {
     mu[i] <- exp(eta(q, mu, y, i))
   }
   
-  valor <- - 1/(2 * s2) * (q[1] - medias[1] + q[2] - medias[2] + q[3] - medias[3]
-                           + q[4] - medias[4] + q[5] - medias[5] + q[6] - medias[6])
+  valor <- - 1/(2 * s2) * ((q[1] - medias[1])^2 + (q[2] - medias[2])^2 
+                           + (q[3] - medias[3])^2 + (q[4] - medias[4])^2 
+                           + (q[5] - medias[5])^2 + (q[6] - medias[6])^2)
   
   for (i in 3:length(y)) {
     valor = valor + ident(y[i]) * (q[5] + q[6] * eta(q, mu, y, i-1) 
                                    + log(wt(q, mu, y, i))) 
-    + (1 - ident(y[i])) * (-exp(eta(q, mu, y, i)) + y[i] 
-                           + log(exp(eta(q, mu, y, i))) - log(factorial(y[i]))
+    + (1 - ident(y[i])) * (-exp(eta(q, mu, y, i)) 
+                           + y[i] * eta(q, mu, y, i) 
+                           - log(factorial(y[i]))
                            - log(1 - exp(-exp(eta(q, mu, y, i)))))
   }
   
