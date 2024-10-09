@@ -18,7 +18,7 @@ ZDP <- function(coefs, mu, y, eta, x) {
 }
 
 rZDP <- function(coefs, mu, y, i) {
-  w <- wt(coefs, mu, y, i)
+  w <- min(0.99, wt(coefs, mu, y, i))
   I <- rbinom(1, 1, prob = w)
   if (I == 0) {
     x <- 0.1
